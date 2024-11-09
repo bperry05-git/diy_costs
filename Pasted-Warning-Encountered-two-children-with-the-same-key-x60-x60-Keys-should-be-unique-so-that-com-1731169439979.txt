@@ -1,0 +1,27 @@
+Warning: Encountered two children with the same key, &#x60;&#x60;. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+    at div
+    at div
+    at _c (https://10f88186-a49c-4763-afe9-ff74f608e517-00-1vsw2n9ayk1ro.janeway.replit.dev/src/components/ui/card.tsx:20:11)
+    at MaterialsList (https://10f88186-a49c-4763-afe9-ff74f608e517-00-1vsw2n9ayk1ro.janeway.replit.dev/src/components/MaterialsList.tsx:18:41)
+    at div
+    at div
+    at div
+    at AnalyzePage (https://10f88186-a49c-4763-afe9-ff74f608e517-00-1vsw2n9ayk1ro.janeway.replit.dev/src/pages/AnalyzePage.tsx:41:37)
+    at Route (https://10f88186-a49c-4763-afe9-ff74f608e517-00-1vsw2n9ayk1ro.janeway.replit.dev/@fs/home/runner/DIYPlannerAI/node_modules/.vite/deps/wouter.js?v=36f8288d:191:16)
+    at Switch (https://10f88186-a49c-4763-afe9-ff74f608e517-00-1vsw2n9ayk1ro.janeway.replit.dev/@fs/home/runner/DIYPlannerAI/node_modules/.vite/deps/wouter.js?v=36f8288d:247:17)
+    at SWRConfig (https://10f88186-a49c-4763-afe9-ff74f608e517-00-1vsw2n9ayk1ro.janeway.replit.dev/@fs/home/runner/DIYPlannerAI/node_modules/.vite/deps/swr.js?v=36f8288d:423:11)
+at div
+at div
+at _c (https://10f88186-a49c-4763-afe9-ff74f608e517-00-1vsw2n9ayk1ro.janeway.replit.dev/src/components/ui/card.tsx:20:11)
+at MaterialsList (https://10f88186-a49c-4763-afe9-ff74f608e517-00-1vsw2n9ayk1ro.janeway.replit.dev/src/components/MaterialsList.tsx:18:41)
+at div
+at div
+at div
+at AnalyzePage (https://10f88186-a49c-4763-afe9-ff74f608e517-00-1vsw2n9ayk1ro.janeway.replit.dev/src/pages/AnalyzePage.tsx:41:37)
+at Route (https://10f88186-a49c-4763-afe9-ff74f608e517-00-1vsw2n9ayk1ro.janeway.replit.dev/@fs/home/runner/DIYPlannerAI/node_modules/.vite/deps/wouter.js?v=36f8288d:191:16)
+at Switch (https://10f88186-a49c-4763-afe9-ff74f608e517-00-1vsw2n9ayk1ro.janeway.replit.dev/@fs/home/runner/DIYPlannerAI/node_modules/.vite/deps/wouter.js?v=36f8288d:247:17)
+at SWRConfig (https://10f88186-a49c-4763-afe9-ff74f608e517-00-1vsw2n9ayk1ro.janeway.replit.dev/@fs/home/runner/DIYPlannerAI/node_modules/.vite/deps/swr.js?v=36f8288d:423:11)
+at t.value (https://10f88186-a49c-4763-afe9-ff74f608e517-00-1vsw2n9ayk1ro.janeway.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:17465)
+at new t (https://10f88186-a49c-4763-afe9-ff74f608e517-00-1vsw2n9ayk1ro.janeway.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:12630)
+at t.value (https://10f88186-a49c-4763-afe9-ff74f608e517-00-1vsw2n9ayk1ro.janeway.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:32766)
+at https://10f88186-a49c-4763-afe9-ff74f608e517-00-1vsw2n9ayk1ro.janeway.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:34400
