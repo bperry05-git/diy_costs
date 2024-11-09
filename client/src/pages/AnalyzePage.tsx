@@ -14,14 +14,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { mutate } from "swr";
 
-// Updated form schema to make description optional when image is present
 const formSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
   description: z.string().optional(),
 }).refine((data) => {
-  // Custom validation to ensure either description or image is provided
-  // This will be checked in combination with the imageData state
-  return true; // The actual validation happens in onSubmit
+  return true;
 }, {
   message: "Please provide either a description or an image",
 });
@@ -41,10 +38,26 @@ export default function AnalyzePage() {
     },
   });
 
+  const handleAnalysisError = (error: any, response?: Response) => {
+    console.error("Analysis failed:", error);
+    let errorMessage = "Failed to analyze project. Please try again.";
+
+    if (response?.status === 413) {
+      errorMessage = "The image is too large. Please try a smaller image or use the compression feature.";
+    } else if (error.message) {
+      errorMessage = error.message;
+    }
+
+    toast({
+      variant: "destructive",
+      title: "Analysis Failed",
+      description: errorMessage,
+    });
+  };
+
   const onSubmit = async (data) => {
     console.log("Form submission started with data:", { ...data, hasImage: !!imageData });
     
-    // Validate that either description or image is provided
     if (!data.description && !imageData) {
       toast({
         variant: "destructive",
@@ -82,12 +95,7 @@ export default function AnalyzePage() {
         description: "Your project has been analyzed successfully.",
       });
     } catch (error) {
-      console.error("Analysis failed:", error);
-      toast({
-        variant: "destructive",
-        title: "Analysis Failed",
-        description: error.message || "Failed to analyze project. Please try again.",
-      });
+      handleAnalysisError(error, error.response);
     } finally {
       setIsAnalyzing(false);
     }

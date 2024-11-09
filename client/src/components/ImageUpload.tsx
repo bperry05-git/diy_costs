@@ -2,17 +2,24 @@ import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Upload, X } from "lucide-react";
+import imageCompression from "browser-image-compression";
 
 interface ImageUploadProps {
   onImageUpload: (base64: string) => void;
   onError: (message: string) => void;
 }
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB - matching server limit
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const COMPRESSION_OPTIONS = {
+  maxSizeMB: 1,
+  maxWidthOrHeight: 1920,
+  useWebWorker: true,
+};
 
 export default function ImageUpload({ onImageUpload, onError }: ImageUploadProps) {
   const [preview, setPreview] = useState<string | null>(null);
+  const [isCompressing, setIsCompressing] = useState(false);
 
   const validateFile = (file: File): boolean => {
     if (!ALLOWED_TYPES.includes(file.type)) {
@@ -21,15 +28,15 @@ export default function ImageUpload({ onImageUpload, onError }: ImageUploadProps
     }
 
     if (file.size > MAX_FILE_SIZE) {
-      onError("File size must be less than 5MB");
-      return false;
+      onError(`File size must be less than ${MAX_FILE_SIZE / (1024 * 1024)}MB. Your file is ${(file.size / (1024 * 1024)).toFixed(2)}MB. The image will be compressed automatically.`);
+      return true; // Still return true as we'll compress it
     }
 
     return true;
   };
 
   const handleFileChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0];
       if (!file) return;
 
@@ -38,24 +45,37 @@ export default function ImageUpload({ onImageUpload, onError }: ImageUploadProps
         return;
       }
 
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        try {
-          const base64 = reader.result as string;
-          setPreview(base64);
-          onImageUpload(base64.split(",")[1]);
-        } catch (error) {
-          onError("Failed to process image. Please try again.");
+      try {
+        setIsCompressing(true);
+        const compressedFile = await imageCompression(file, COMPRESSION_OPTIONS);
+        console.log('Original file size:', file.size / 1024 / 1024, 'MB');
+        console.log('Compressed file size:', compressedFile.size / 1024 / 1024, 'MB');
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          try {
+            const base64 = reader.result as string;
+            setPreview(base64);
+            onImageUpload(base64.split(",")[1]);
+          } catch (error) {
+            onError("Failed to process image. Please try again.");
+            setPreview(null);
+          }
+        };
+
+        reader.onerror = () => {
+          onError("Failed to read image file. Please try again.");
           setPreview(null);
-        }
-      };
+        };
 
-      reader.onerror = () => {
-        onError("Failed to read image file. Please try again.");
+        reader.readAsDataURL(compressedFile);
+      } catch (error) {
+        console.error("Image compression failed:", error);
+        onError("Failed to compress image. Please try uploading a smaller image or a different format.");
         setPreview(null);
-      };
-
-      reader.readAsDataURL(file);
+      } finally {
+        setIsCompressing(false);
+      }
     },
     [onImageUpload, onError]
   );
@@ -91,13 +111,22 @@ export default function ImageUpload({ onImageUpload, onError }: ImageUploadProps
             </>
           ) : (
             <div className="flex flex-col items-center justify-center pt-5 pb-6">
-              <Upload className="w-8 h-8 mb-4 text-muted-foreground" />
-              <p className="mb-2 text-sm text-muted-foreground">
-                Click to upload or drag and drop
-              </p>
-              <p className="text-xs text-muted-foreground">
-                JPEG, PNG or WebP (MAX. 5MB)
-              </p>
+              {isCompressing ? (
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent mb-4"></div>
+                  <p className="text-sm text-muted-foreground">Compressing image...</p>
+                </div>
+              ) : (
+                <>
+                  <Upload className="w-8 h-8 mb-4 text-muted-foreground" />
+                  <p className="mb-2 text-sm text-muted-foreground">
+                    Click to upload or drag and drop
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    JPEG, PNG or WebP (MAX. 10MB)
+                  </p>
+                </>
+              )}
             </div>
           )}
           <input
@@ -106,6 +135,7 @@ export default function ImageUpload({ onImageUpload, onError }: ImageUploadProps
             className="hidden"
             accept="image/jpeg,image/png,image/webp"
             onChange={handleFileChange}
+            disabled={isCompressing}
           />
         </label>
       </div>
