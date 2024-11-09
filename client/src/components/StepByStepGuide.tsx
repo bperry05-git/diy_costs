@@ -1,6 +1,6 @@
 import { Step } from "../lib/types";
 import { Card } from "@/components/ui/card";
-import { Clock, Tool, Lightbulb } from "lucide-react";
+import { Clock, Wrench, Lightbulb } from "lucide-react";
 
 interface StepByStepGuideProps {
   steps: Step[];
@@ -42,7 +42,7 @@ export default function StepByStepGuide({ steps }: StepByStepGuideProps) {
                 {step.requiredMaterials && step.requiredMaterials.length > 0 && (
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-sm font-medium">
-                      <Tool className="w-4 h-4" />
+                      <Wrench className="w-4 h-4" />
                       <span>Materials needed:</span>
                     </div>
                     <ul className="list-disc list-inside text-sm text-muted-foreground pl-4">
