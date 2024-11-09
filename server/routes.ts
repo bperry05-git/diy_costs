@@ -9,11 +9,19 @@ export function registerRoutes(app: Express) {
   app.post("/api/analyze", async (req, res) => {
     try {
       const { description, image } = req.body;
+      if (!description) {
+        return res.status(400).json({ error: "Description is required" });
+      }
       
       let analysisInput = description;
       if (image) {
-        const imageAnalysis = await analyzeImage(image);
-        analysisInput = `${description}\n\nImage Analysis: ${imageAnalysis}`;
+        try {
+          const imageAnalysis = await analyzeImage(image);
+          analysisInput = `${description}\n\nImage Analysis: ${imageAnalysis}`;
+        } catch (error) {
+          console.error("Image analysis failed:", error);
+          // Continue with text analysis even if image analysis fails
+        }
       }
 
       const analysis = await analyzeProject(analysisInput);
@@ -21,6 +29,48 @@ export function registerRoutes(app: Express) {
     } catch (error) {
       console.error("Analysis failed:", error);
       res.status(500).json({ error: "Failed to analyze project" });
+    }
+  });
+
+  // Save a project
+  app.post("/api/projects", async (req, res) => {
+    try {
+      const { title, description, imageUrl, analysis } = req.body;
+
+      if (!title || !description || !analysis) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      const result = await db.transaction(async (tx) => {
+        const [project] = await tx
+          .insert(projects)
+          .values({
+            title,
+            description,
+            imageUrl,
+          })
+          .returning();
+
+        const [analysisRecord] = await tx
+          .insert(analyses)
+          .values({
+            projectId: project.id,
+            difficulty: analysis.difficulty,
+            estimatedTime: analysis.estimatedTime,
+            estimatedCost: analysis.estimatedCost,
+            requiredSkills: analysis.requiredSkills,
+            notes: analysis.notes,
+            materials: analysis.materials,
+          })
+          .returning();
+
+        return { ...project, analysis: analysisRecord };
+      });
+
+      res.status(201).json(result);
+    } catch (error) {
+      console.error("Failed to save project:", error);
+      res.status(500).json({ error: "Failed to save project" });
     }
   });
 
