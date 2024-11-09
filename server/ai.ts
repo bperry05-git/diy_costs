@@ -3,16 +3,24 @@ import { ProjectAnalysis } from "../client/src/lib/types";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
+const DIFFICULTY_CRITERIA = {
+  1: "Basic DIY skills, common household tools, simple assembly or decoration",
+  2: "Basic power tools, some measuring, simple cuts and attachments",
+  3: "Multiple tools and skills, precise measurements, moderate complexity",
+  4: "Specialized tools, advanced techniques, complex assembly or modifications",
+  5: "Expert knowledge, professional tools, complex planning and execution"
+};
+
 export async function analyzeImage(base64Image: string): Promise<string> {
   const response = await openai.chat.completions.create({
-    model: "gpt-4o",
+    model: "gpt-4-vision-preview",
     messages: [
       {
         role: "user",
         content: [
           {
             type: "text",
-            text: "Analyze this DIY project image and describe the materials, tools, complexity level, and step-by-step instructions visible in the image."
+            text: "Analyze this DIY project image and describe the materials, tools, complexity level, and step-by-step instructions visible in the image. Pay special attention to the complexity level based on tools needed, precision required, and skill level needed."
           },
           {
             type: "image_url",
@@ -30,14 +38,18 @@ export async function analyzeImage(base64Image: string): Promise<string> {
 
 export async function analyzeProject(description: string): Promise<ProjectAnalysis> {
   const response = await openai.chat.completions.create({
-    model: "gpt-4o",
+    model: "gpt-4",
     messages: [
       {
         role: "system",
-        content: `You are a DIY project expert. Analyze the project description and provide detailed recommendations including:
-- Difficulty level (1-5)
+        content: `You are a DIY project expert. Analyze the project description and provide detailed recommendations.
+Consider these difficulty levels carefully:
+${Object.entries(DIFFICULTY_CRITERIA).map(([level, criteria]) => `Level ${level}: ${criteria}`).join('\n')}
+
+Include in your analysis:
+- Difficulty level (1-5) based on the criteria above
 - Estimated time in hours
-- Required skills
+- Required skills (be specific about tool proficiency and techniques needed)
 - Materials list with quantities and estimated costs
 - Important notes or warnings
 - Step-by-step guide with detailed instructions

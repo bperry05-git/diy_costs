@@ -1,9 +1,32 @@
 import { Card } from "@/components/ui/card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { ProjectAnalysis as AnalysisType } from "../lib/types";
+import { HelpCircle } from "lucide-react";
 
 interface ProjectAnalysisProps {
   analysis: AnalysisType;
 }
+
+const DIFFICULTY_LABELS = {
+  1: "Beginner",
+  2: "Easy",
+  3: "Intermediate",
+  4: "Advanced",
+  5: "Expert",
+};
+
+const DIFFICULTY_DESCRIPTIONS = {
+  1: "Perfect for first-time DIYers. Basic tools and minimal expertise required.",
+  2: "Simple project with straightforward steps. Some basic DIY experience helpful.",
+  3: "Moderate complexity requiring some specific skills and tools.",
+  4: "Complex project requiring significant experience and specialized tools.",
+  5: "Expert-level project demanding extensive knowledge and advanced techniques.",
+};
 
 export default function ProjectAnalysis({ analysis }: ProjectAnalysisProps) {
   return (
@@ -12,18 +35,37 @@ export default function ProjectAnalysis({ analysis }: ProjectAnalysisProps) {
       
       <div className="space-y-4">
         <div>
-          <h3 className="font-medium mb-2">Difficulty Level</h3>
-          <div className="flex gap-1">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div
-                key={i}
-                className={`w-6 h-6 rounded-full ${
-                  i < analysis.difficulty
-                    ? "bg-accent"
-                    : "bg-muted"
-                }`}
-              />
-            ))}
+          <div className="flex items-center gap-2 mb-2">
+            <h3 className="font-medium">Difficulty Level</h3>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <HelpCircle className="w-4 h-4 text-muted-foreground" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="max-w-xs">
+                    {DIFFICULTY_DESCRIPTIONS[analysis.difficulty as keyof typeof DIFFICULTY_DESCRIPTIONS]}
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+          <div className="flex flex-col gap-2">
+            <div className="flex gap-1">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div
+                  key={i}
+                  className={`w-6 h-6 rounded-full transition-colors ${
+                    i < analysis.difficulty
+                      ? "bg-accent"
+                      : "bg-muted"
+                  }`}
+                />
+              ))}
+            </div>
+            <span className="text-sm text-muted-foreground">
+              {DIFFICULTY_LABELS[analysis.difficulty as keyof typeof DIFFICULTY_LABELS]}
+            </span>
           </div>
         </div>
 
