@@ -1,4 +1,3 @@
-{/* Previous imports remain the same */}
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -91,7 +90,25 @@ export default function AnalyzePage() {
       }
 
       console.log("Analysis result:", result);
-      setAnalysisData(result);
+
+      // Transform the API response to match our frontend types
+      const transformedAnalysis = {
+        difficulty: result.difficulty_level,
+        estimatedTime: result.estimated_time_hours,
+        estimatedCost: result.materials_list.reduce((total: number, item: { estimated_cost: string }) => {
+          const cost = parseInt(item.estimated_cost.replace(/[^0-9]/g, ''));
+          return total + (cost || 0);
+        }, 0),
+        requiredSkills: result.required_skills,
+        notes: result.important_notes_warnings.join('\n'),
+        materialsList: result.materials_list.map((item: { item: string; quantity: string; estimated_cost: string; }) => ({
+          item: item.item,
+          quantity: item.quantity,
+          cost: item.estimated_cost
+        }))
+      };
+
+      setAnalysisData(transformedAnalysis);
       toast({
         title: "Analysis Complete",
         description: "Your project has been analyzed successfully.",
