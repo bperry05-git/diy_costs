@@ -9,7 +9,6 @@ import { useToast } from "@/hooks/use-toast";
 import ImageUpload from "../components/ImageUpload";
 import ProjectAnalysis from "../components/ProjectAnalysis";
 import MaterialsList from "../components/MaterialsList";
-import StepByStepGuide from "../components/StepByStepGuide";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -58,6 +57,8 @@ export default function AnalyzePage() {
   };
 
   const onSubmit = async (data: FormData) => {
+    console.log("Form submission started with data:", { ...data, hasImage: !!imageData });
+    
     if (!data.description && !imageData) {
       toast({
         variant: "destructive",
@@ -69,6 +70,7 @@ export default function AnalyzePage() {
 
     try {
       setIsAnalyzing(true);
+      console.log("Sending request to /api/analyze");
       
       const response = await fetch("/api/analyze", {
         method: "POST",
@@ -80,12 +82,16 @@ export default function AnalyzePage() {
         }),
       });
 
+      console.log("Response status:", response.status);
       const result = await response.json();
       
       if (!response.ok) {
         throw new Error(result.error || "Analysis failed");
       }
 
+      console.log("Analysis result:", result);
+
+      // Transform the API response with safer fallbacks
       const transformedAnalysis = {
         difficulty: result.difficulty_level || result.difficultyLevel || 1,
         estimatedTime: result.estimated_time_hours || result.estimatedTimeHours || 0,
@@ -105,8 +111,7 @@ export default function AnalyzePage() {
               quantity: item.quantity || '',
               cost: item.estimated_cost || item.cost || '$0'
             }))
-          : [],
-        guide: result.guide || result.steps || []
+          : []
       };
 
       setAnalysisData(transformedAnalysis);
@@ -126,6 +131,11 @@ export default function AnalyzePage() {
 
     try {
       setIsSaving(true);
+      console.log("Saving project with data:", {
+        title: form.getValues("title"),
+        description: form.getValues("description"),
+        hasImage: !!imageData,
+      });
 
       const response = await fetch("/api/projects", {
         method: "POST",
@@ -164,7 +174,7 @@ export default function AnalyzePage() {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8">Project Analysis</h1>
 
-      <div className="grid lg:grid-cols-2 gap-8">
+      <div className="grid md:grid-cols-2 gap-8">
         <Card className="p-6">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -236,7 +246,6 @@ export default function AnalyzePage() {
           <div className="space-y-8">
             <ProjectAnalysis analysis={analysisData} />
             <MaterialsList materials={analysisData.materialsList} />
-            {analysisData.guide && <StepByStepGuide steps={analysisData.guide} />}
           </div>
         )}
       </div>

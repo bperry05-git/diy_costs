@@ -11,9 +11,9 @@ export default function MaterialsList({ materials }: MaterialsListProps) {
       <h2 className="text-2xl font-semibold mb-4">Required Materials</h2>
       
       <div className="space-y-4">
-        {materials.map((material, index) => (
+        {materials.map((material) => (
           <div
-            key={`${index}-${material.item}`}
+            key={material.item}
             className="flex justify-between items-center border-b py-2"
           >
             <div>
