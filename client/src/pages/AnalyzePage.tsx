@@ -14,9 +14,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { mutate } from "swr";
 
+// Updated form schema to make description optional when image is present
 const formSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
-  description: z.string().min(10, "Please provide a detailed description"),
+  description: z.string().optional(),
+}).refine((data) => {
+  // Custom validation to ensure either description or image is provided
+  // This will be checked in combination with the imageData state
+  return true; // The actual validation happens in onSubmit
+}, {
+  message: "Please provide either a description or an image",
 });
 
 export default function AnalyzePage() {
@@ -35,8 +42,22 @@ export default function AnalyzePage() {
   });
 
   const onSubmit = async (data) => {
+    console.log("Form submission started with data:", { ...data, hasImage: !!imageData });
+    
+    // Validate that either description or image is provided
+    if (!data.description && !imageData) {
+      toast({
+        variant: "destructive",
+        title: "Validation Error",
+        description: "Please provide either a description or an image",
+      });
+      return;
+    }
+
     try {
       setIsAnalyzing(true);
+      console.log("Sending request to /api/analyze");
+      
       const response = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -47,23 +68,26 @@ export default function AnalyzePage() {
         }),
       });
 
+      console.log("Response status:", response.status);
+      const result = await response.json();
+      
       if (!response.ok) {
-        throw new Error("Analysis failed");
+        throw new Error(result.error || "Analysis failed");
       }
 
-      const result = await response.json();
+      console.log("Analysis result:", result);
       setAnalysisData(result);
       toast({
         title: "Analysis Complete",
         description: "Your project has been analyzed successfully.",
       });
     } catch (error) {
+      console.error("Analysis failed:", error);
       toast({
         variant: "destructive",
         title: "Analysis Failed",
-        description: "Failed to analyze project. Please try again.",
+        description: error.message || "Failed to analyze project. Please try again.",
       });
-      console.error("Analysis failed:", error);
     } finally {
       setIsAnalyzing(false);
     }
@@ -74,19 +98,26 @@ export default function AnalyzePage() {
 
     try {
       setIsSaving(true);
+      console.log("Saving project with data:", {
+        title: form.getValues("title"),
+        description: form.getValues("description"),
+        hasImage: !!imageData,
+      });
+
       const response = await fetch("/api/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: form.getValues("title"),
-          description: form.getValues("description"),
+          description: form.getValues("description") || "",
           imageUrl: imageData ? `data:image/jpeg;base64,${imageData}` : null,
           analysis: analysisData,
         }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to save project");
+        const error = await response.json();
+        throw new Error(error.error || "Failed to save project");
       }
 
       await mutate("/api/projects");
@@ -95,12 +126,12 @@ export default function AnalyzePage() {
         description: "Your project has been saved successfully.",
       });
     } catch (error) {
+      console.error("Save failed:", error);
       toast({
         variant: "destructive",
         title: "Save Failed",
-        description: "Failed to save project. Please try again.",
+        description: error.message || "Failed to save project. Please try again.",
       });
-      console.error("Save failed:", error);
     } finally {
       setIsSaving(false);
     }

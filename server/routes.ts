@@ -9,18 +9,25 @@ export function registerRoutes(app: Express) {
   app.post("/api/analyze", async (req, res) => {
     try {
       const { description, image } = req.body;
-      if (!description) {
-        return res.status(400).json({ error: "Description is required" });
+      
+      // Updated validation to accept either description or image
+      if (!description && !image) {
+        return res.status(400).json({ error: "Either description or image is required" });
       }
       
-      let analysisInput = description;
+      let analysisInput = description || "";
       if (image) {
         try {
           const imageAnalysis = await analyzeImage(image);
-          analysisInput = `${description}\n\nImage Analysis: ${imageAnalysis}`;
+          analysisInput = description 
+            ? `${description}\n\nImage Analysis: ${imageAnalysis}`
+            : imageAnalysis;
         } catch (error) {
           console.error("Image analysis failed:", error);
-          // Continue with text analysis even if image analysis fails
+          if (!description) {
+            return res.status(400).json({ error: "Image analysis failed. Please provide a description or try another image." });
+          }
+          // Continue with text analysis if description is available
         }
       }
 
@@ -28,7 +35,10 @@ export function registerRoutes(app: Express) {
       res.json(analysis);
     } catch (error) {
       console.error("Analysis failed:", error);
-      res.status(500).json({ error: "Failed to analyze project" });
+      res.status(500).json({ 
+        error: "Failed to analyze project", 
+        details: error.message 
+      });
     }
   });
 
