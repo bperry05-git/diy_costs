@@ -13,20 +13,17 @@ export default function MaterialsList({ materials }: MaterialsListProps) {
       <div className="space-y-4">
         {materials.map((material) => (
           <div
-            key={material.name}
+            key={material.item}
             className="flex justify-between items-center border-b py-2"
           >
             <div>
-              <h3 className="font-medium">{material.name}</h3>
+              <h3 className="font-medium">{material.item}</h3>
               <p className="text-sm text-muted-foreground">
-                {material.description}
+                {material.quantity}
               </p>
             </div>
             <div className="text-right">
-              <p className="font-medium">${material.estimatedCost}</p>
-              <p className="text-sm text-muted-foreground">
-                {material.quantity} {material.unit}
-              </p>
+              <p className="font-medium">{material.cost}</p>
             </div>
           </div>
         ))}

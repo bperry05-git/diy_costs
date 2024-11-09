@@ -1,3 +1,4 @@
+{/* Previous imports remain the same */}
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,24 +14,25 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { mutate } from "swr";
+import type { ProjectAnalysis as ProjectAnalysisType } from "../lib/types";
 
 const formSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
   description: z.string().optional(),
-}).refine((data) => {
-  return true;
-}, {
+}).refine(() => true, {
   message: "Please provide either a description or an image",
 });
 
+type FormData = z.infer<typeof formSchema>;
+
 export default function AnalyzePage() {
   const [imageData, setImageData] = useState<string | null>(null);
-  const [analysisData, setAnalysisData] = useState(null);
+  const [analysisData, setAnalysisData] = useState<ProjectAnalysisType | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
 
-  const form = useForm({
+  const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
@@ -38,13 +40,13 @@ export default function AnalyzePage() {
     },
   });
 
-  const handleAnalysisError = (error: any, response?: Response) => {
+  const handleAnalysisError = (error: unknown, response?: Response) => {
     console.error("Analysis failed:", error);
     let errorMessage = "Failed to analyze project. Please try again.";
 
     if (response?.status === 413) {
       errorMessage = "The image is too large. Please try a smaller image or use the compression feature.";
-    } else if (error.message) {
+    } else if (error instanceof Error) {
       errorMessage = error.message;
     }
 
@@ -55,7 +57,7 @@ export default function AnalyzePage() {
     });
   };
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data: FormData) => {
     console.log("Form submission started with data:", { ...data, hasImage: !!imageData });
     
     if (!data.description && !imageData) {
@@ -95,7 +97,7 @@ export default function AnalyzePage() {
         description: "Your project has been analyzed successfully.",
       });
     } catch (error) {
-      handleAnalysisError(error, error.response);
+      handleAnalysisError(error);
     } finally {
       setIsAnalyzing(false);
     }
@@ -138,7 +140,7 @@ export default function AnalyzePage() {
       toast({
         variant: "destructive",
         title: "Save Failed",
-        description: error.message || "Failed to save project. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to save project. Please try again.",
       });
     } finally {
       setIsSaving(false);
@@ -220,7 +222,7 @@ export default function AnalyzePage() {
         {analysisData && (
           <div className="space-y-8">
             <ProjectAnalysis analysis={analysisData} />
-            <MaterialsList materials={analysisData.materials} />
+            <MaterialsList materials={analysisData.materialsList} />
           </div>
         )}
       </div>

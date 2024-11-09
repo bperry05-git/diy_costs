@@ -1,9 +1,7 @@
 export interface Material {
-  name: string;
-  description: string;
-  quantity: number;
-  unit: string;
-  estimatedCost: number;
+  item: string;
+  quantity: string;
+  cost: string;
 }
 
 export interface ProjectAnalysis {
@@ -12,7 +10,7 @@ export interface ProjectAnalysis {
   estimatedCost: number;
   requiredSkills: string[];
   notes: string;
-  materials: Material[];
+  materialsList: Material[];
 }
 
 export interface Project {
