@@ -1,7 +1,6 @@
 import OpenAI from "openai";
 import { ProjectAnalysis } from "../client/src/lib/types";
 
-// the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function analyzeImage(base64Image: string): Promise<string> {
@@ -13,7 +12,7 @@ export async function analyzeImage(base64Image: string): Promise<string> {
         content: [
           {
             type: "text",
-            text: "Analyze this DIY project image and describe the materials, tools, and complexity level visible in the image."
+            text: "Analyze this DIY project image and describe the materials, tools, complexity level, and step-by-step instructions visible in the image."
           },
           {
             type: "image_url",
@@ -41,7 +40,16 @@ export async function analyzeProject(description: string): Promise<ProjectAnalys
 - Required skills
 - Materials list with quantities and estimated costs
 - Important notes or warnings
-Respond in JSON format matching the ProjectAnalysis type.`
+- Step-by-step guide with detailed instructions
+
+For the step-by-step guide, include:
+- Clear titles for each step
+- Detailed descriptions
+- Required materials per step
+- Time estimates per step
+- Helpful tips and tricks
+
+Respond in JSON format matching the ProjectAnalysis type with an additional guide array containing steps.`
       },
       {
         role: "user",

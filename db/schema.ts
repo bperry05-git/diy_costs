@@ -21,12 +21,24 @@ export const analyses = pgTable("analyses", {
   materials: jsonb("materials").notNull(),
 });
 
+export const guides = pgTable("guides", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  projectId: integer("project_id").references(() => projects.id).notNull(),
+  steps: jsonb("steps").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export const insertProjectSchema = createInsertSchema(projects);
 export const selectProjectSchema = createSelectSchema(projects);
 export const insertAnalysisSchema = createInsertSchema(analyses);
 export const selectAnalysisSchema = createSelectSchema(analyses);
+export const insertGuideSchema = createInsertSchema(guides);
+export const selectGuideSchema = createSelectSchema(guides);
 
 export type InsertProject = z.infer<typeof insertProjectSchema>;
 export type Project = z.infer<typeof selectProjectSchema>;
 export type InsertAnalysis = z.infer<typeof insertAnalysisSchema>;
 export type Analysis = z.infer<typeof selectAnalysisSchema>;
+export type InsertGuide = z.infer<typeof insertGuideSchema>;
+export type Guide = z.infer<typeof selectGuideSchema>;

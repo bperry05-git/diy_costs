@@ -4,6 +4,23 @@ export interface Material {
   cost: string;
 }
 
+export interface Step {
+  title: string;
+  description: string;
+  imageUrl?: string;
+  tips?: string[];
+  estimatedTime?: number;
+  requiredMaterials?: string[];
+}
+
+export interface ProjectGuide {
+  id: number;
+  projectId: number;
+  steps: Step[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface ProjectAnalysis {
   difficulty: number;
   estimatedTime: number;
@@ -11,6 +28,7 @@ export interface ProjectAnalysis {
   requiredSkills: string[];
   notes: string;
   materialsList: Material[];
+  guide?: Step[];
 }
 
 export interface Project {
