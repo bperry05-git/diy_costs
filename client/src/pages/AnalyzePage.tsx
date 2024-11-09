@@ -91,21 +91,27 @@ export default function AnalyzePage() {
 
       console.log("Analysis result:", result);
 
-      // Transform the API response to match our frontend types
+      // Transform the API response with safer fallbacks
       const transformedAnalysis = {
-        difficulty: result.difficulty_level,
-        estimatedTime: result.estimated_time_hours,
-        estimatedCost: result.materials_list.reduce((total: number, item: { estimated_cost: string }) => {
-          const cost = parseInt(item.estimated_cost.replace(/[^0-9]/g, ''));
-          return total + (cost || 0);
-        }, 0),
-        requiredSkills: result.required_skills,
-        notes: result.important_notes_warnings.join('\n'),
-        materialsList: result.materials_list.map((item: { item: string; quantity: string; estimated_cost: string; }) => ({
-          item: item.item,
-          quantity: item.quantity,
-          cost: item.estimated_cost
-        }))
+        difficulty: result.difficulty_level || result.difficultyLevel || 1,
+        estimatedTime: result.estimated_time_hours || result.estimatedTimeHours || 0,
+        estimatedCost: Array.isArray(result.materials_list || result.materialsList) 
+          ? (result.materials_list || result.materialsList).reduce((total, item) => {
+              const cost = parseInt(String(item.estimated_cost || item.cost).replace(/[^0-9]/g, '')) || 0;
+              return total + cost;
+            }, 0)
+          : 0,
+        requiredSkills: result.required_skills || result.requiredSkills || [],
+        notes: Array.isArray(result.important_notes_warnings || result.importantNotesOrWarnings)
+          ? (result.important_notes_warnings || result.importantNotesOrWarnings).join('\n')
+          : '',
+        materialsList: Array.isArray(result.materials_list || result.materialsList)
+          ? (result.materials_list || result.materialsList).map(item => ({
+              item: item.item || '',
+              quantity: item.quantity || '',
+              cost: item.estimated_cost || item.cost || '$0'
+            }))
+          : []
       };
 
       setAnalysisData(transformedAnalysis);
