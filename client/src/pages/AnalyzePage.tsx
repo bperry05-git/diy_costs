@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import ImageUpload from "../components/ImageUpload";
 import ProjectAnalysis from "../components/ProjectAnalysis";
 import MaterialsList from "../components/MaterialsList";
+import ProcessingScreen from "../components/ProcessingScreen";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -27,7 +28,7 @@ type FormData = z.infer<typeof formSchema>;
 export default function AnalyzePage() {
   const [imageData, setImageData] = useState<string | null>(null);
   const [analysisData, setAnalysisData] = useState<ProjectAnalysisType | null>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [processingStage, setProcessingStage] = useState<"uploading" | "analyzing" | "generating" | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
 
@@ -54,6 +55,7 @@ export default function AnalyzePage() {
       title: "Analysis Failed",
       description: errorMessage,
     });
+    setProcessingStage(null);
   };
 
   const onSubmit = async (data: FormData) => {
@@ -69,8 +71,12 @@ export default function AnalyzePage() {
     }
 
     try {
-      setIsAnalyzing(true);
+      setProcessingStage("uploading");
       console.log("Sending request to /api/analyze");
+      
+      // Simulate upload time for better UX
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setProcessingStage("analyzing");
       
       const response = await fetch("/api/analyze", {
         method: "POST",
@@ -83,6 +89,8 @@ export default function AnalyzePage() {
       });
 
       console.log("Response status:", response.status);
+      
+      setProcessingStage("generating");
       const result = await response.json();
       
       if (!response.ok) {
@@ -90,6 +98,9 @@ export default function AnalyzePage() {
       }
 
       console.log("Analysis result:", result);
+
+      // Simulate processing time for better UX
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       // Transform the API response to match our frontend types
       const transformedAnalysis = {
@@ -120,14 +131,13 @@ export default function AnalyzePage() {
       };
 
       setAnalysisData(transformedAnalysis);
+      setProcessingStage(null);
       toast({
         title: "Analysis Complete",
         description: "Your project has been analyzed successfully.",
       });
     } catch (error) {
       handleAnalysisError(error);
-    } finally {
-      setIsAnalyzing(false);
     }
   };
 
@@ -174,6 +184,14 @@ export default function AnalyzePage() {
       setIsSaving(false);
     }
   };
+
+  if (processingStage) {
+    return (
+      <div className="container mx-auto px-4 py-16">
+        <ProcessingScreen stage={processingStage} />
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -229,8 +247,8 @@ export default function AnalyzePage() {
               </Tabs>
 
               <div className="flex gap-4">
-                <Button type="submit" disabled={isAnalyzing}>
-                  {isAnalyzing ? "Analyzing..." : "Analyze Project"}
+                <Button type="submit">
+                  Analyze Project
                 </Button>
                 {analysisData && (
                   <Button 
