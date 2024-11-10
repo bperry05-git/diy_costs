@@ -13,7 +13,7 @@ export async function analyzeImage(base64Image: string): Promise<string> {
         content: [
           {
             type: "text",
-            text: "Analyze this DIY project image and describe the materials, tools, and complexity level visible in the image."
+            text: "Analyze this DIY project image and provide detailed information about the materials, tools needed, step-by-step instructions, and complexity level visible in the image."
           },
           {
             type: "image_url",
@@ -35,7 +35,7 @@ export async function analyzeProject(description: string): Promise<ProjectAnalys
     messages: [
       {
         role: "system",
-        content: `You are a DIY project expert. Analyze the project description and provide detailed recommendations in the following JSON format:
+        content: `You are a DIY project expert. Analyze the project description and provide detailed recommendations. Each step in the instructions should be clear, actionable, and include safety precautions where necessary. Format your response in the following JSON format:
 {
   "DifficultyLevel": number (1-5),
   "EstimatedTimeHours": number,
@@ -51,9 +51,13 @@ export async function analyzeProject(description: string): Promise<ProjectAnalys
   "StepByStepInstructions": [
     {
       "StepNumber": number,
-      "Instruction": string
+      "Instruction": string,
+      "EstimatedTime": string,
+      "SafetyNotes": string,
+      "ToolsNeeded": string[]
     }
-  ]
+  ],
+  "ImportantNotesWarnings": string[]
 }`
       },
       {
