@@ -103,13 +103,13 @@ export default function AnalyzePage() {
       await new Promise(resolve => setTimeout(resolve, 1000));
 
       // Transform the API response to match our frontend types
-      const transformedAnalysis = {
+      const transformedAnalysis: ProjectAnalysisType = {
         difficulty: result.DifficultyLevel || result.difficulty_level || 1,
         estimatedTime: result.EstimatedTimeHours || result.estimated_time_hours || 0,
         estimatedCost: result.EstimatedCost || 0,
         requiredSkills: result.RequiredSkills || result.required_skills || [],
         notes: (result.ImportantNotesWarnings || result.important_notes_warnings || []).join('\n'),
-        materialsList: (result.MaterialsList || result.materials_list || []).map(item => ({
+        materialsList: (result.MaterialsList || result.materials_list || []).map((item: any) => ({
           item: item.Material || item.item || '',
           category: item.Category || item.category || '',
           quantity: item.Quantity || item.quantity || '',
@@ -121,7 +121,7 @@ export default function AnalyzePage() {
           usageInstructions: item.UsageInstructions || item.usage_instructions,
           importantNotes: item.ImportantNotes || item.important_notes
         })),
-        instructions: (result.StepByStepInstructions || []).map(step => ({
+        instructions: (result.StepByStepInstructions || []).map((step: any) => ({
           instruction: step.Instruction,
           stepNumber: step.StepNumber,
           estimatedTime: step.EstimatedTime,
@@ -197,7 +197,7 @@ export default function AnalyzePage() {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8">Project Analysis</h1>
 
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="space-y-8">
         <Card className="p-6">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -264,6 +264,16 @@ export default function AnalyzePage() {
             </form>
           </Form>
         </Card>
+
+        {imageData && (
+          <Card className="p-6 mb-8">
+            <img 
+              src={`data:image/jpeg;base64,${imageData}`}
+              alt="Project"
+              className="w-full max-h-[400px] object-contain rounded-lg"
+            />
+          </Card>
+        )}
 
         {analysisData && (
           <div className="space-y-8">
