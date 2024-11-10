@@ -195,10 +195,9 @@ export default function AnalyzePage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Project Analysis</h1>
-
-      <div className="space-y-8">
-        {!analysisData ? (
+      {!analysisData ? (
+        <>
+          <h1 className="text-3xl font-bold mb-8">Project Analysis</h1>
           <Card className="p-6">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -255,33 +254,34 @@ export default function AnalyzePage() {
               </form>
             </Form>
           </Card>
-        ) : (
-          <>
-            {imageData && (
-              <Card className="p-6 mb-8">
-                <img 
-                  src={`data:image/jpeg;base64,${imageData}`}
-                  alt="Project"
-                  className="w-full max-h-[400px] object-contain rounded-lg"
-                />
-              </Card>
-            )}
-            <div className="space-y-8">
-              <ProjectAnalysis analysis={analysisData} />
-              <MaterialsList materials={analysisData.materialsList} />
-              <div className="flex justify-end">
-                <Button 
-                  variant="outline" 
-                  onClick={handleSave}
-                  disabled={isSaving}
-                >
-                  {isSaving ? "Saving..." : "Save Project"}
-                </Button>
-              </div>
-            </div>
-          </>
-        )}
-      </div>
+        </>
+      ) : (
+        <>
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-3xl font-bold">{form.getValues("title")}</h1>
+            <Button 
+              variant="outline" 
+              onClick={handleSave}
+              disabled={isSaving}
+            >
+              {isSaving ? "Saving..." : "Save Project"}
+            </Button>
+          </div>
+          {imageData && (
+            <Card className="p-6 mb-8">
+              <img 
+                src={`data:image/jpeg;base64,${imageData}`}
+                alt="Project"
+                className="w-full max-h-[400px] object-contain rounded-lg"
+              />
+            </Card>
+          )}
+          <div className="space-y-8">
+            <ProjectAnalysis analysis={analysisData} />
+            <MaterialsList materials={analysisData.materialsList} />
+          </div>
+        </>
+      )}
     </div>
   );
 }
