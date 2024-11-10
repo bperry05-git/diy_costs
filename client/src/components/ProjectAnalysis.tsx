@@ -8,7 +8,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { ProjectAnalysis as AnalysisType } from "../lib/types";
+import { ProjectAnalysis as AnalysisType, Instruction } from "../lib/types";
 
 interface ProjectAnalysisProps {
   analysis: AnalysisType;
@@ -37,6 +37,29 @@ export default function ProjectAnalysis({ analysis }: ProjectAnalysisProps) {
   const hasInstructions = instructions.length > 0;
   const difficultyLabel = DIFFICULTY_LABELS[analysis.difficulty as keyof typeof DIFFICULTY_LABELS] || "Unknown";
   const difficultyDescription = DIFFICULTY_DESCRIPTIONS[analysis.difficulty as keyof typeof DIFFICULTY_DESCRIPTIONS] || "";
+
+  // Helper function to get the current instruction text
+  const getCurrentInstructionText = () => {
+    const currentInstruction = instructions[currentStep];
+    if (typeof currentInstruction === 'string') {
+      return currentInstruction;
+    }
+    return (currentInstruction as Instruction)?.instruction ?? '';
+  };
+
+  // Helper function to get the current instruction object
+  const getCurrentInstructionObject = (): Instruction | null => {
+    const currentInstruction = instructions[currentStep];
+    if (!currentInstruction || typeof currentInstruction === 'string') {
+      return null;
+    }
+    return currentInstruction as Instruction;
+  };
+
+  const currentInstructionObj = getCurrentInstructionObject();
+  const tools = currentInstructionObj?.tools ?? [];
+  const estimatedTime = currentInstructionObj?.estimatedTime ?? '';
+  const safetyNotes = currentInstructionObj?.safetyNotes ?? '';
 
   return (
     <Card className="p-6">
@@ -113,26 +136,26 @@ export default function ProjectAnalysis({ analysis }: ProjectAnalysisProps) {
 
             <div className="min-h-[200px] mb-4">
               <div className="space-y-4">
-                {instructions[currentStep]?.tools && (
+                {tools.length > 0 && (
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Wrench className="w-4 h-4" />
-                    <span>Tools needed: {instructions[currentStep].tools.join(", ")}</span>
+                    <span>Tools needed: {tools.join(", ")}</span>
                   </div>
                 )}
 
-                {instructions[currentStep]?.estimatedTime && (
+                {estimatedTime && (
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Clock className="w-4 h-4" />
-                    <span>Estimated time: {instructions[currentStep].estimatedTime}</span>
+                    <span>Estimated time: {estimatedTime}</span>
                   </div>
                 )}
 
-                <p className="text-lg">{instructions[currentStep]}</p>
+                <p className="text-lg">{getCurrentInstructionText()}</p>
 
-                {instructions[currentStep]?.safetyNotes && (
+                {safetyNotes && (
                   <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md flex items-start gap-2">
                     <AlertTriangle className="w-5 h-5 text-yellow-600 shrink-0 mt-0.5" />
-                    <p className="text-sm text-yellow-700">{instructions[currentStep].safetyNotes}</p>
+                    <p className="text-sm text-yellow-700">{safetyNotes}</p>
                   </div>
                 )}
               </div>
