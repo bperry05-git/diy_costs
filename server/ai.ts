@@ -13,7 +13,7 @@ export async function analyzeImage(base64Image: string): Promise<string> {
         content: [
           {
             type: "text",
-            text: "Analyze this DIY project image and provide detailed information about the materials, tools needed, step-by-step instructions, and complexity level visible in the image."
+            text: "Analyze this DIY project image and provide detailed information about the materials, tools needed, step-by-step instructions, and complexity level visible in the image. For materials, include specific brands, where to buy, and important specifications."
           },
           {
             type: "image_url",
@@ -35,7 +35,8 @@ export async function analyzeProject(description: string): Promise<ProjectAnalys
     messages: [
       {
         role: "system",
-        content: `You are a DIY project expert. Analyze the project description and provide detailed recommendations. Each step in the instructions should be clear, actionable, and include safety precautions where necessary. Format your response in the following JSON format:
+        content: `You are a DIY project expert with extensive knowledge of building materials and supplies. Analyze the project description and provide comprehensive recommendations. Focus on detailed material specifications and alternatives. Format your response in the following JSON format:
+
 {
   "DifficultyLevel": number (1-5),
   "EstimatedTimeHours": number,
@@ -45,7 +46,13 @@ export async function analyzeProject(description: string): Promise<ProjectAnalys
     {
       "Material": string,
       "Quantity": string,
-      "EstimatedCost": number
+      "EstimatedCost": number,
+      "Specifications": string (Include dimensions, grade, type, etc.),
+      "RecommendedBrands": string[] (2-3 specific brand recommendations),
+      "AlternativeOptions": string[] (1-2 alternative materials),
+      "WhereToBuy": string[] (List of stores or online retailers),
+      "UsageInstructions": string (Brief handling/application instructions),
+      "ImportantNotes": string (Any crucial specifications or warnings)
     }
   ],
   "StepByStepInstructions": [

@@ -101,7 +101,13 @@ export default function AnalyzePage() {
         materialsList: (result.MaterialsList || result.materials_list || []).map(item => ({
           item: item.Material || item.item || '',
           quantity: item.Quantity || item.quantity || '',
-          cost: `$${item.EstimatedCost || item.estimated_cost || 0}`
+          cost: `$${item.EstimatedCost || item.estimated_cost || 0}`,
+          specifications: item.Specifications || item.specifications,
+          recommendedBrands: item.RecommendedBrands || item.recommended_brands,
+          alternativeOptions: item.AlternativeOptions || item.alternative_options,
+          whereToBuy: item.WhereToBuy || item.where_to_buy,
+          usageInstructions: item.UsageInstructions || item.usage_instructions,
+          importantNotes: item.ImportantNotes || item.important_notes
         })),
         instructions: (result.StepByStepInstructions || []).map(step => step.Instruction)
       };

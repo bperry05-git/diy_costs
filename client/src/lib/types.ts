@@ -2,6 +2,12 @@ export interface Material {
   item: string;
   quantity: string;
   cost: string;
+  specifications?: string;
+  recommendedBrands?: string[];
+  alternativeOptions?: string[];
+  whereToBuy?: string[];
+  usageInstructions?: string;
+  importantNotes?: string;
 }
 
 export interface Instruction {
