@@ -91,27 +91,19 @@ export default function AnalyzePage() {
 
       console.log("Analysis result:", result);
 
-      // Transform the API response with safer fallbacks
+      // Transform the API response to match our frontend types
       const transformedAnalysis = {
-        difficulty: result.difficulty_level || result.difficultyLevel || 1,
-        estimatedTime: result.estimated_time_hours || result.estimatedTimeHours || 0,
-        estimatedCost: Array.isArray(result.materials_list || result.materialsList) 
-          ? (result.materials_list || result.materialsList).reduce((total, item) => {
-              const cost = parseInt(String(item.estimated_cost || item.cost).replace(/[^0-9]/g, '')) || 0;
-              return total + cost;
-            }, 0)
-          : 0,
-        requiredSkills: result.required_skills || result.requiredSkills || [],
-        notes: Array.isArray(result.important_notes_warnings || result.importantNotesOrWarnings)
-          ? (result.important_notes_warnings || result.importantNotesOrWarnings).join('\n')
-          : '',
-        materialsList: Array.isArray(result.materials_list || result.materialsList)
-          ? (result.materials_list || result.materialsList).map(item => ({
-              item: item.item || '',
-              quantity: item.quantity || '',
-              cost: item.estimated_cost || item.cost || '$0'
-            }))
-          : []
+        difficulty: result.DifficultyLevel || result.difficulty_level || 1,
+        estimatedTime: result.EstimatedTimeHours || result.estimated_time_hours || 0,
+        estimatedCost: result.EstimatedCost || 0,
+        requiredSkills: result.RequiredSkills || result.required_skills || [],
+        notes: (result.ImportantNotesWarnings || result.important_notes_warnings || []).join('\n'),
+        materialsList: (result.MaterialsList || result.materials_list || []).map(item => ({
+          item: item.Material || item.item || '',
+          quantity: item.Quantity || item.quantity || '',
+          cost: `$${item.EstimatedCost || item.estimated_cost || 0}`
+        })),
+        instructions: (result.StepByStepInstructions || []).map(step => step.Instruction)
       };
 
       setAnalysisData(transformedAnalysis);
