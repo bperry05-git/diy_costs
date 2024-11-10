@@ -38,9 +38,10 @@ export async function analyzeProject(description: string): Promise<ProjectAnalys
         content: `You are a DIY project expert. Analyze the project description and provide detailed recommendations including:
 - Difficulty level (1-5)
 - Estimated time in hours
+- Estimated cost of the project
 - Required skills
 - Materials list with quantities and estimated costs
-- Important notes or warnings
+- Step by Step Instructions to build the project
 Respond in JSON format matching the ProjectAnalysis type.`
       },
       {

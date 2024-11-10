@@ -12,6 +12,16 @@ export default function ProjectAnalysis({ analysis }: ProjectAnalysisProps) {
       
       <div className="space-y-4">
         <div>
+          <h3 className="font-medium mb-2">Total Cost Estimate</h3>
+          <p className="text-lg">${analysis.estimatedCost}</p>
+        </div>
+
+        <div>
+          <h3 className="font-medium mb-2">Estimated Time</h3>
+          <p className="text-lg">{analysis.estimatedTime} hours</p>
+        </div>
+
+        <div>
           <h3 className="font-medium mb-2">Difficulty Level</h3>
           <div className="flex gap-1">
             {Array.from({ length: 5 }).map((_, i) => (
@@ -25,18 +35,6 @@ export default function ProjectAnalysis({ analysis }: ProjectAnalysisProps) {
               />
             ))}
           </div>
-        </div>
-
-        <div>
-          <h3 className="font-medium mb-2">Estimated Time</h3>
-          <p className="text-lg">
-            {analysis.estimatedTime} hours
-          </p>
-        </div>
-
-        <div>
-          <h3 className="font-medium mb-2">Total Cost Estimate</h3>
-          <p className="text-lg">${analysis.estimatedCost}</p>
         </div>
 
         <div>
@@ -57,6 +55,19 @@ export default function ProjectAnalysis({ analysis }: ProjectAnalysisProps) {
           <h3 className="font-medium mb-2">Notes</h3>
           <p className="text-muted-foreground">{analysis.notes}</p>
         </div>
+
+        {analysis.instructions && (
+          <div>
+            <h3 className="font-medium mb-2">Instructions</h3>
+            <ul className="list-disc pl-5 space-y-2">
+              {analysis.instructions.map((instruction, index) => (
+                <li key={index} className="text-muted-foreground">
+                  {instruction}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     </Card>
   );

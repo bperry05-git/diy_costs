@@ -11,6 +11,7 @@ export interface ProjectAnalysis {
   requiredSkills: string[];
   notes: string;
   materialsList: Material[];
+  instructions?: string[];
 }
 
 export interface Project {
