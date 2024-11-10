@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Clock, Tool, AlertTriangle } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, Wrench, AlertTriangle } from "lucide-react";
 import { ProjectAnalysis as AnalysisType } from "../lib/types";
 
 interface ProjectAnalysisProps {
@@ -74,7 +74,7 @@ export default function ProjectAnalysis({ analysis }: ProjectAnalysisProps) {
               <div className="space-y-4">
                 {instructions[currentStep]?.tools && (
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Tool className="w-4 h-4" />
+                    <Wrench className="w-4 h-4" />
                     <span>Tools needed: {instructions[currentStep].tools.join(", ")}</span>
                   </div>
                 )}
