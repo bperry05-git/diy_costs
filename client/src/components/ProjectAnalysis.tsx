@@ -2,17 +2,41 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Clock, Wrench, AlertTriangle } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { ProjectAnalysis as AnalysisType } from "../lib/types";
 
 interface ProjectAnalysisProps {
   analysis: AnalysisType;
 }
 
+const DIFFICULTY_LABELS = {
+  1: "Beginner",
+  2: "Easy",
+  3: "Intermediate",
+  4: "Advanced",
+  5: "Expert",
+};
+
+const DIFFICULTY_DESCRIPTIONS = {
+  1: "Perfect for first-time DIYers. Basic tools and minimal experience required.",
+  2: "Simple project with straightforward steps. Some basic DIY experience helpful.",
+  3: "Requires moderate skill level and familiarity with tools and techniques.",
+  4: "Complex project requiring significant experience and specialized skills.",
+  5: "Expert-level project demanding advanced expertise and professional-grade tools.",
+};
+
 export default function ProjectAnalysis({ analysis }: ProjectAnalysisProps) {
   const [currentStep, setCurrentStep] = useState(0);
 
   const instructions = analysis.instructions || [];
   const hasInstructions = instructions.length > 0;
+  const difficultyLabel = DIFFICULTY_LABELS[analysis.difficulty as keyof typeof DIFFICULTY_LABELS] || "Unknown";
+  const difficultyDescription = DIFFICULTY_DESCRIPTIONS[analysis.difficulty as keyof typeof DIFFICULTY_DESCRIPTIONS] || "";
 
   return (
     <Card className="p-6">
@@ -31,19 +55,36 @@ export default function ProjectAnalysis({ analysis }: ProjectAnalysisProps) {
           </div>
 
           <div className="p-4 bg-secondary/50 rounded-lg">
-            <h3 className="font-medium mb-2">Difficulty Level</h3>
-            <div className="flex gap-1">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div
-                  key={i}
-                  className={`w-6 h-6 rounded-full ${
-                    i < analysis.difficulty
-                      ? "bg-accent"
-                      : "bg-muted"
-                  }`}
-                />
-              ))}
-            </div>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div>
+                    <h3 className="font-medium mb-2">Difficulty Level</h3>
+                    <div className="space-y-2">
+                      <div className="flex gap-1">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <div
+                            key={i}
+                            className={`w-6 h-6 rounded-full ${
+                              i < analysis.difficulty
+                                ? "bg-accent"
+                                : "bg-muted"
+                            }`}
+                            role="img"
+                            aria-label={`Difficulty level ${i + 1} ${i < analysis.difficulty ? 'filled' : 'empty'}`}
+                          />
+                        ))}
+                      </div>
+                      <p className="text-sm font-medium">{difficultyLabel}</p>
+                    </div>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs p-4">
+                  <p className="font-medium mb-1">{difficultyLabel}</p>
+                  <p className="text-sm text-muted-foreground">{difficultyDescription}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
 
@@ -119,7 +160,7 @@ export default function ProjectAnalysis({ analysis }: ProjectAnalysisProps) {
 
         <div>
           <h3 className="font-medium mb-2">Additional Notes</h3>
-          <p className="text-muted-foreground">{analysis.notes}</p>
+          <p className="text-muted-foreground whitespace-pre-line">{analysis.notes}</p>
         </div>
       </div>
     </Card>
