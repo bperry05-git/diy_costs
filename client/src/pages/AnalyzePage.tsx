@@ -198,88 +198,88 @@ export default function AnalyzePage() {
       <h1 className="text-3xl font-bold mb-8">Project Analysis</h1>
 
       <div className="space-y-8">
-        <Card className="p-6">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <div>
-                <Input
-                  placeholder="Project Title"
-                  {...form.register("title")}
-                />
-                {form.formState.errors.title && (
-                  <p className="text-destructive text-sm mt-1">
-                    {form.formState.errors.title.message}
-                  </p>
-                )}
-              </div>
-
-              <Tabs defaultValue="image">
-                <TabsList className="mb-4">
-                  <TabsTrigger value="image">Upload Image</TabsTrigger>
-                  <TabsTrigger value="text">Text Description</TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="image">
-                  <ImageUpload 
-                    onImageUpload={setImageData}
-                    onError={(error) => {
-                      toast({
-                        variant: "destructive",
-                        title: "Upload Failed",
-                        description: error,
-                      });
-                    }}
+        {!analysisData ? (
+          <Card className="p-6">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <div>
+                  <Input
+                    placeholder="Project Title"
+                    {...form.register("title")}
                   />
-                </TabsContent>
-
-                <TabsContent value="text">
-                  <Textarea
-                    placeholder="Describe your DIY project in detail..."
-                    {...form.register("description")}
-                    className="mb-4"
-                  />
-                  {form.formState.errors.description && (
-                    <p className="text-destructive text-sm mb-4">
-                      {form.formState.errors.description.message}
+                  {form.formState.errors.title && (
+                    <p className="text-destructive text-sm mt-1">
+                      {form.formState.errors.title.message}
                     </p>
                   )}
-                </TabsContent>
-              </Tabs>
+                </div>
 
-              <div className="flex gap-4">
-                <Button type="submit">
-                  Analyze Project
-                </Button>
-                {analysisData && (
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={handleSave}
-                    disabled={isSaving}
-                  >
-                    {isSaving ? "Saving..." : "Save Project"}
+                <Tabs defaultValue="image">
+                  <TabsList className="mb-4">
+                    <TabsTrigger value="image">Upload Image</TabsTrigger>
+                    <TabsTrigger value="text">Text Description</TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="image">
+                    <ImageUpload 
+                      onImageUpload={setImageData}
+                      onError={(error) => {
+                        toast({
+                          variant: "destructive",
+                          title: "Upload Failed",
+                          description: error,
+                        });
+                      }}
+                    />
+                  </TabsContent>
+
+                  <TabsContent value="text">
+                    <Textarea
+                      placeholder="Describe your DIY project in detail..."
+                      {...form.register("description")}
+                      className="mb-4"
+                    />
+                    {form.formState.errors.description && (
+                      <p className="text-destructive text-sm mb-4">
+                        {form.formState.errors.description.message}
+                      </p>
+                    )}
+                  </TabsContent>
+                </Tabs>
+
+                <div className="flex gap-4">
+                  <Button type="submit">
+                    Analyze Project
                   </Button>
-                )}
-              </div>
-            </form>
-          </Form>
-        </Card>
-
-        {imageData && (
-          <Card className="p-6 mb-8">
-            <img 
-              src={`data:image/jpeg;base64,${imageData}`}
-              alt="Project"
-              className="w-full max-h-[400px] object-contain rounded-lg"
-            />
+                </div>
+              </form>
+            </Form>
           </Card>
-        )}
-
-        {analysisData && (
-          <div className="space-y-8">
-            <ProjectAnalysis analysis={analysisData} />
-            <MaterialsList materials={analysisData.materialsList} />
-          </div>
+        ) : (
+          <>
+            {imageData && (
+              <Card className="p-6 mb-8">
+                <img 
+                  src={`data:image/jpeg;base64,${imageData}`}
+                  alt="Project"
+                  className="w-full max-h-[400px] object-contain rounded-lg"
+                />
+              </Card>
+            )}
+            <div className="space-y-8">
+              <ProjectAnalysis analysis={analysisData} />
+              <MaterialsList materials={analysisData.materialsList} />
+              <div className="flex justify-end">
+                <Button 
+                  variant="outline" 
+                  onClick={handleSave}
+                  disabled={isSaving}
+                >
+                  {isSaving ? "Saving..." : "Save Project"}
+                </Button>
+              </div>
+            </div>
+          </>
         )}
       </div>
     </div>
