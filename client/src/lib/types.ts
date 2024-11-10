@@ -1,5 +1,6 @@
 export interface Material {
   item: string;
+  category?: string;
   quantity: string;
   cost: string;
   specifications?: string;

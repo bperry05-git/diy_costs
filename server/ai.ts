@@ -13,7 +13,7 @@ export async function analyzeImage(base64Image: string): Promise<string> {
         content: [
           {
             type: "text",
-            text: "Analyze this DIY project image and provide detailed information about the materials, tools needed, step-by-step instructions, and complexity level visible in the image. For materials, include specific brands, where to buy, and important specifications."
+            text: "Analyze this DIY project image and provide an EXHAUSTIVE list of ALL required materials down to the smallest items. Include foundation materials, structural components, hardware, tools, and finishing materials. Nothing should be omitted. Consider safety equipment, consumables, and specialized tools that might be needed."
           },
           {
             type: "image_url",
@@ -35,8 +35,19 @@ export async function analyzeProject(description: string): Promise<ProjectAnalys
     messages: [
       {
         role: "system",
-        content: `You are a DIY project expert with extensive knowledge of building materials and supplies. Analyze the project description and provide comprehensive recommendations. Focus on detailed material specifications and alternatives. Format your response in the following JSON format:
+        content: `You are a DIY project expert with extensive knowledge of building materials and supplies. For any project, provide an EXHAUSTIVE list of ALL required materials down to the smallest items. Include foundation materials, structural components, hardware, tools, and finishing materials. Nothing should be omitted.
 
+For example, for a deck project you must include:
+1. Foundation (concrete, post hole digger, gravel)
+2. Structure (posts, beams, joists, blocking)
+3. Hardware (post anchors, joist hangers, structural screws, nails)
+4. Decking (boards, fascia)
+5. Railings (posts, rails, balusters, post caps)
+6. Stairs (stringers, treads, risers)
+7. Tools (saw, drill, level, tape measure)
+8. Finishing (stain, sealer, brushes)
+
+Format your response in the following JSON format:
 {
   "DifficultyLevel": number (1-5),
   "EstimatedTimeHours": number,
@@ -45,14 +56,15 @@ export async function analyzeProject(description: string): Promise<ProjectAnalys
   "MaterialsList": [
     {
       "Material": string,
+      "Category": string,
       "Quantity": string,
       "EstimatedCost": number,
-      "Specifications": string (Include dimensions, grade, type, etc.),
-      "RecommendedBrands": string[] (2-3 specific brand recommendations),
-      "AlternativeOptions": string[] (1-2 alternative materials),
-      "WhereToBuy": string[] (List of stores or online retailers),
-      "UsageInstructions": string (Brief handling/application instructions),
-      "ImportantNotes": string (Any crucial specifications or warnings)
+      "Specifications": string (Include dimensions, grade, type),
+      "RecommendedBrands": string[],
+      "AlternativeOptions": string[],
+      "WhereToBuy": string[],
+      "UsageInstructions": string,
+      "ImportantNotes": string
     }
   ],
   "StepByStepInstructions": [
@@ -74,6 +86,10 @@ export async function analyzeProject(description: string): Promise<ProjectAnalys
     ],
     response_format: { type: "json_object" }
   });
+
+  if (!response.choices[0].message.content) {
+    throw new Error("No content in response");
+  }
 
   return JSON.parse(response.choices[0].message.content);
 }

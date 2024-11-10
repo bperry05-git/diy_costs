@@ -100,6 +100,7 @@ export default function AnalyzePage() {
         notes: (result.ImportantNotesWarnings || result.important_notes_warnings || []).join('\n'),
         materialsList: (result.MaterialsList || result.materials_list || []).map(item => ({
           item: item.Material || item.item || '',
+          category: item.Category || item.category || '',
           quantity: item.Quantity || item.quantity || '',
           cost: `$${item.EstimatedCost || item.estimated_cost || 0}`,
           specifications: item.Specifications || item.specifications,
@@ -109,7 +110,13 @@ export default function AnalyzePage() {
           usageInstructions: item.UsageInstructions || item.usage_instructions,
           importantNotes: item.ImportantNotes || item.important_notes
         })),
-        instructions: (result.StepByStepInstructions || []).map(step => step.Instruction)
+        instructions: (result.StepByStepInstructions || []).map(step => ({
+          instruction: step.Instruction,
+          stepNumber: step.StepNumber,
+          estimatedTime: step.EstimatedTime,
+          safetyNotes: step.SafetyNotes,
+          tools: step.ToolsNeeded
+        }))
       };
 
       setAnalysisData(transformedAnalysis);
