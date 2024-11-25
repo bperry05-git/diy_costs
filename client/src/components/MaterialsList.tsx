@@ -213,30 +213,46 @@ export default function MaterialsList({ materials }: MaterialsListProps) {
                                 </p>
                               </div>
 
-                              {isExpanded && (
+                              {searchingMaterial === material.item && (
                                 <div className="mt-4 border-t pt-4">
                                   <div className="flex justify-between items-center mb-4">
                                     <h4 className="font-medium">
                                       Available Products
                                     </h4>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => setSearchingMaterial(null)}
+                                    >
+                                      <ChevronUp className="h-4 w-4" />
+                                    </Button>
                                   </div>
-                                  {searchError[material.item] ? (
+                                  {searchError ? (
                                     <div className="text-sm text-destructive space-y-2">
                                       <p>
                                         Failed to load products: {searchError}
                                       </p>
-                                      </div>
-                                  ) : !searchResults[material.item] ? (
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() =>
+                                          searchProducts(material.item)
+                                        }
+                                      >
+                                        Retry Search
+                                      </Button>
+                                    </div>
+                                  ) : !searchResults ? (
                                     <div className="flex justify-center py-4">
                                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
                                     </div>
-                                  ) : searchResults[material.item]?.products.length === 0 ? (
+                                  ) : searchResults.products.length === 0 ? (
                                     <p className="text-sm text-muted-foreground">
                                       No products found
                                     </p>
                                   ) : (
                                     <div className="grid gap-4">
-                                      {searchResults[material.item]?.products.map(
+                                      {searchResults.products.map(
                                         (product, i) => (
                                           <a
                                             key={i}
