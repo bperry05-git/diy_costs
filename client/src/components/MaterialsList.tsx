@@ -1,14 +1,19 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronUp, Store, AlertTriangle, Info, ChevronDownIcon, ChevronUpIcon } from "lucide-react";
-import { Material } from "../lib/types";
+import { ChevronDown, ChevronUp, Store, AlertTriangle, Info, ChevronDownIcon, ChevronUpIcon, Search, ExternalLink } from "lucide-react";
+import { Material, Product } from "../lib/types";
+import useSWR from "swr";
 
 interface MaterialsListProps {
   materials: Material[];
 }
 
-export default function MaterialsList({ materials }: MaterialsListProps) {
+  export default function MaterialsList({ materials }: MaterialsListProps) {
+  const [searchingMaterial, setSearchingMaterial] = useState<string | null>(null);
+  const { data: searchResults, error: searchError } = useSWR<{ products: Product[] }>(
+    searchingMaterial ? `/api/search-products?query=${encodeURIComponent(searchingMaterial)}` : null
+  );
   // Use local storage to persist expansion state
   const [expandedItems, setExpandedItems] = useState<number[]>(() => {
     try {
@@ -97,16 +102,25 @@ export default function MaterialsList({ materials }: MaterialsListProps) {
                         Quantity: {material.quantity}
                       </p>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className={`ml-4 transition-transform duration-200 ${
-                        isExpanded ? 'rotate-180' : ''
-                      }`}
-                      onClick={() => toggleItem(index)}
-                    >
-                      <ChevronDown className="h-4 w-4" />
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setSearchingMaterial(material.item)}
+                      >
+                        <Search className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className={`transition-transform duration-200 ${
+                          isExpanded ? 'rotate-180' : ''
+                        }`}
+                        onClick={() => toggleItem(index)}
+                      >
+                        <ChevronDown className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
 
                   <div
@@ -168,6 +182,81 @@ export default function MaterialsList({ materials }: MaterialsListProps) {
                           <div>
                             <h4 className="font-medium mb-1">Usage Instructions</h4>
                             <p className="text-sm text-muted-foreground">
+                        {searchingMaterial === material.item && (
+                          <div className="mt-4 border-t pt-4">
+                            <div className="flex justify-between items-center mb-4">
+                              <h4 className="font-medium">Available Products</h4>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setSearchingMaterial(null)}
+                              >
+                                <ChevronUp className="h-4 w-4" />
+                              </Button>
+                            </div>
+                            {searchError ? (
+                              <p className="text-sm text-destructive">Failed to load products</p>
+                            ) : !searchResults ? (
+                              <div className="flex justify-center py-4">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
+                              </div>
+                            ) : searchResults.products.length === 0 ? (
+                              <p className="text-sm text-muted-foreground">No products found</p>
+                            ) : (
+                              <div className="grid gap-4">
+                                {searchResults.products.map((product, i) => (
+                                  <a
+                                    key={i}
+                                    href={product.link}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-start gap-4 p-4 rounded-lg hover:bg-secondary/50 transition-colors"
+                                  >
+                                    {product.thumbnail && (
+                                      <img
+                                        src={product.thumbnail}
+                                        alt={product.title}
+                                        className="w-20 h-20 object-cover rounded-md"
+                                      />
+                                    )}
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-start justify-between gap-2">
+                                        <h5 className="font-medium text-sm line-clamp-2">
+                                          {product.title}
+                                        </h5>
+                                        <ExternalLink className="h-4 w-4 shrink-0 text-muted-foreground" />
+                                      </div>
+                                      <p className="text-sm font-medium mt-1">{product.price}</p>
+                                      {product.rating && (
+                                        <div className="flex items-center gap-2 mt-1">
+                                          <div className="flex">
+                                            {Array.from({ length: 5 }).map((_, i) => (
+                                              <span
+                                                key={i}
+                                                className={`text-sm ${
+                                                  i < Math.round(product.rating)
+                                                    ? "text-yellow-400"
+                                                    : "text-muted"
+                                                }`}
+                                              >
+                                                ★
+                                              </span>
+                                            ))}
+                                          </div>
+                                          {product.reviews && (
+                                            <span className="text-xs text-muted-foreground">
+                                              ({product.reviews})
+                                            </span>
+                                          )}
+                                        </div>
+                                      )}
+                                    </div>
+                                  </a>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
                               {material.usageInstructions}
                             </p>
                           </div>

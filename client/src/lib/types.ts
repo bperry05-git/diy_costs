@@ -40,3 +40,12 @@ export interface Project {
 export interface ProjectWithAnalysis extends Project {
   analysis: ProjectAnalysis;
 }
+export interface Product {
+  title: string;
+  price: string;
+  link: string;
+  thumbnail: string;
+  rating?: number;
+  reviews?: number;
+  store: string;
+}

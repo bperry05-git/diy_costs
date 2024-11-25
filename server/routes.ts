@@ -3,6 +3,7 @@ import { analyzeProject, analyzeImage } from "./ai";
 import { db } from "../db";
 import { projects, analyses } from "../db/schema";
 import { eq } from "drizzle-orm";
+import axios from "axios";
 
 export function registerRoutes(app: Express) {
   // Analyze a project
@@ -101,6 +102,39 @@ export function registerRoutes(app: Express) {
     } catch (error) {
       console.error("Failed to fetch projects:", error);
       res.status(500).json({ error: "Failed to fetch projects" });
+  // Search Home Depot products
+  app.get("/api/search-products", async (req, res) => {
+    try {
+      const { query } = req.query;
+      if (!query) {
+        return res.status(400).json({ error: "Search query is required" });
+      }
+
+      const response = await axios.get("https://serpapi.com/search", {
+        params: {
+          engine: "home_depot",
+          q: query,
+          api_key: process.env.SERPAPI_API_KEY,
+        },
+      });
+
+      // Extract relevant product information
+      const products = response.data.products?.map((product: any) => ({
+        title: product.title,
+        price: product.price,
+        link: product.link,
+        thumbnail: product.thumbnail,
+        rating: product.rating,
+        reviews: product.reviews,
+        store: product.store || "Home Depot",
+      })) || [];
+
+      res.json({ products });
+    } catch (error) {
+      console.error("Product search failed:", error);
+      res.status(500).json({ error: "Failed to search products" });
+    }
+  });
     }
   });
 }
