@@ -11,9 +11,40 @@ interface MaterialsListProps {
 
   export default function MaterialsList({ materials }: MaterialsListProps) {
   const [searchingMaterial, setSearchingMaterial] = useState<string | null>(null);
-  const { data: searchResults, error: searchError } = useSWR<{ products: Product[] }>(
-    searchingMaterial ? `/api/search-products?query=${encodeURIComponent(searchingMaterial)}` : null
-  );
+  const [searchResults, setSearchResults] = useState<{ products: Product[] } | null>(null);
+  const [searchError, setSearchError] = useState<string | null>(null);
+
+  const searchProducts = async (query: string) => {
+    try {
+      setSearchError(null);
+      const response = await fetch(`/api/search-products?query=${encodeURIComponent(query)}`);
+      const data = await response.json();
+      
+      if (!response.ok) {
+        console.error("Product search failed:", {
+          status: response.status,
+          error: data.error,
+          details: data.details
+        });
+        throw new Error(data.error || "Failed to load products");
+      }
+      
+      setSearchResults(data);
+    } catch (error) {
+      console.error("Error searching products:", error);
+      setSearchError(error instanceof Error ? error.message : "Failed to load products");
+      setSearchResults(null);
+    }
+  };
+
+  useEffect(() => {
+    if (searchingMaterial) {
+      searchProducts(searchingMaterial);
+    } else {
+      setSearchResults(null);
+      setSearchError(null);
+    }
+  }, [searchingMaterial]);
   // Use local storage to persist expansion state
   const [expandedItems, setExpandedItems] = useState<number[]>(() => {
     try {
@@ -200,7 +231,16 @@ interface MaterialsListProps {
                                   </Button>
                                 </div>
                                 {searchError ? (
-                                  <p className="text-sm text-destructive">Failed to load products</p>
+                                  <div className="text-sm text-destructive space-y-2">
+                                    <p>Failed to load products: {searchError}</p>
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm" 
+                                      onClick={() => searchProducts(material.item)}
+                                    >
+                                      Retry Search
+                                    </Button>
+                                  </div>
                                 ) : !searchResults ? (
                                   <div className="flex justify-center py-4">
                                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>

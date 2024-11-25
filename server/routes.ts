@@ -110,6 +110,8 @@ export function registerRoutes(app: Express) {
         return res.status(400).json({ error: "Search query is required" });
       }
 
+      console.log("Searching Home Depot products for:", query);
+      
       const response = await axios.get("https://serpapi.com/search", {
         params: {
           engine: "home_depot",
@@ -118,8 +120,17 @@ export function registerRoutes(app: Express) {
         },
       });
 
-      // Extract relevant product information
-      const products = response.data.products?.map((product: any) => ({
+      if (!response.data) {
+        console.error("No data received from SerpAPI");
+        return res.status(500).json({ error: "No data received from product search" });
+      }
+
+      if (!response.data.products) {
+        console.error("No products found in response:", response.data);
+        return res.status(404).json({ error: "No products found" });
+      }
+
+      const products = response.data.products.map((product: any) => ({
         title: product.title,
         price: product.price,
         link: product.link,
@@ -127,12 +138,25 @@ export function registerRoutes(app: Express) {
         rating: product.rating,
         reviews: product.reviews,
         store: product.store || "Home Depot",
-      })) || [];
+      }));
 
+      console.log(`Found ${products.length} products`);
       res.json({ products });
-    } catch (error) {
-      console.error("Product search failed:", error);
-      res.status(500).json({ error: "Failed to search products" });
+    } catch (error: any) {
+      console.error("Product search failed:", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+      });
+
+      const errorMessage = error.response?.data?.error || error.message || "Failed to search products";
+      res.status(error.response?.status || 500).json({ 
+        error: errorMessage,
+        details: process.env.NODE_ENV === 'development' ? {
+          status: error.response?.status,
+          data: error.response?.data
+        } : undefined
+      });
     }
   });
     }
