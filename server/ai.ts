@@ -60,20 +60,8 @@ Format your response in the following JSON format:
       "Quantity": string,
       "EstimatedCost": number,
       "Specifications": string (Include dimensions, grade, type),
-      "RecommendedBrands": string[],
-      "AlternativeOptions": string[],
-      "WhereToBuy": string[],
       "UsageInstructions": string,
       "ImportantNotes": string
-    }
-  ],
-  "StepByStepInstructions": [
-    {
-      "StepNumber": number,
-      "Instruction": string,
-      "EstimatedTime": string,
-      "SafetyNotes": string,
-      "ToolsNeeded": string[]
     }
   ],
   "ImportantNotesWarnings": string[]

@@ -200,48 +200,7 @@ export default function MaterialsList({ materials }: MaterialsListProps) {
                             </div>
                           )}
 
-                          {material.recommendedBrands &&
-                            material.recommendedBrands.length > 0 && (
-                              <div>
-                                <h4 className="font-medium mb-1">
-                                  Recommended Brands
-                                </h4>
-                                <ul className="list-disc list-inside text-sm text-muted-foreground">
-                                  {material.recommendedBrands.map((brand) => (
-                                    <li key={brand}>{brand}</li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-
-                          {material.alternativeOptions &&
-                            material.alternativeOptions.length > 0 && (
-                              <div>
-                                <h4 className="font-medium mb-1">
-                                  Alternative Options
-                                </h4>
-                                <ul className="list-disc list-inside text-sm text-muted-foreground">
-                                  {material.alternativeOptions.map((option) => (
-                                    <li key={option}>{option}</li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-
-                          {material.whereToBuy &&
-                            material.whereToBuy.length > 0 && (
-                              <div>
-                                <h4 className="font-medium mb-1 flex items-center gap-2">
-                                  <Store className="w-4 h-4" />
-                                  Where to Buy
-                                </h4>
-                                <ul className="list-disc list-inside text-sm text-muted-foreground">
-                                  {material.whereToBuy.map((store) => (
-                                    <li key={store}>{store}</li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
+                          
 
                           {material.usageInstructions && (
                             <div className="space-y-4">

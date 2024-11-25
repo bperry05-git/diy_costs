@@ -71,23 +71,7 @@ export default function ProjectAnalysis({ analysis }: ProjectAnalysisProps) {
           </div>
         </div>
 
-        {hasInstructions && (
-          <div className="border rounded-lg p-4">
-            <h3 className="text-xl font-semibold mb-4">Instructions</h3>
-            <div className="space-y-4">
-              {instructions.map((instruction, index) => {
-                const stepInstruction = typeof instruction === 'string' 
-                  ? instruction 
-                  : instruction.instruction;
-                return (
-                  <div key={index} className="border-b pb-4 last:border-b-0">
-                    <p className="text-lg">Step {index + 1}: {stepInstruction}</p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
+        
 
         <div>
           <h3 className="font-medium mb-2">Additional Notes</h3>
