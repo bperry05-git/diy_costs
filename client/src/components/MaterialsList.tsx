@@ -179,86 +179,89 @@ interface MaterialsListProps {
                         )}
 
                         {material.usageInstructions && (
-                          <div>
-                            <h4 className="font-medium mb-1">Usage Instructions</h4>
-                            <p className="text-sm text-muted-foreground">
-                        {searchingMaterial === material.item && (
-                          <div className="mt-4 border-t pt-4">
-                            <div className="flex justify-between items-center mb-4">
-                              <h4 className="font-medium">Available Products</h4>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setSearchingMaterial(null)}
-                              >
-                                <ChevronUp className="h-4 w-4" />
-                              </Button>
+                          <div className="space-y-4">
+                            <div>
+                              <h4 className="font-medium mb-1">Usage Instructions</h4>
+                              <p className="text-sm text-muted-foreground">
+                                {material.usageInstructions}
+                              </p>
                             </div>
-                            {searchError ? (
-                              <p className="text-sm text-destructive">Failed to load products</p>
-                            ) : !searchResults ? (
-                              <div className="flex justify-center py-4">
-                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
-                              </div>
-                            ) : searchResults.products.length === 0 ? (
-                              <p className="text-sm text-muted-foreground">No products found</p>
-                            ) : (
-                              <div className="grid gap-4">
-                                {searchResults.products.map((product, i) => (
-                                  <a
-                                    key={i}
-                                    href={product.link}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex items-start gap-4 p-4 rounded-lg hover:bg-secondary/50 transition-colors"
+
+                            {searchingMaterial === material.item && (
+                              <div className="mt-4 border-t pt-4">
+                                <div className="flex justify-between items-center mb-4">
+                                  <h4 className="font-medium">Available Products</h4>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setSearchingMaterial(null)}
                                   >
-                                    {product.thumbnail && (
-                                      <img
-                                        src={product.thumbnail}
-                                        alt={product.title}
-                                        className="w-20 h-20 object-cover rounded-md"
-                                      />
-                                    )}
-                                    <div className="flex-1 min-w-0">
-                                      <div className="flex items-start justify-between gap-2">
-                                        <h5 className="font-medium text-sm line-clamp-2">
-                                          {product.title}
-                                        </h5>
-                                        <ExternalLink className="h-4 w-4 shrink-0 text-muted-foreground" />
-                                      </div>
-                                      <p className="text-sm font-medium mt-1">{product.price}</p>
-                                      {product.rating && (
-                                        <div className="flex items-center gap-2 mt-1">
-                                          <div className="flex">
-                                            {Array.from({ length: 5 }).map((_, i) => (
-                                              <span
-                                                key={i}
-                                                className={`text-sm ${
-                                                  i < Math.round(product.rating)
-                                                    ? "text-yellow-400"
-                                                    : "text-muted"
-                                                }`}
-                                              >
-                                                ★
-                                              </span>
-                                            ))}
+                                    <ChevronUp className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                                {searchError ? (
+                                  <p className="text-sm text-destructive">Failed to load products</p>
+                                ) : !searchResults ? (
+                                  <div className="flex justify-center py-4">
+                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
+                                  </div>
+                                ) : searchResults.products.length === 0 ? (
+                                  <p className="text-sm text-muted-foreground">No products found</p>
+                                ) : (
+                                  <div className="grid gap-4">
+                                    {searchResults.products.map((product, i) => (
+                                      <a
+                                        key={i}
+                                        href={product.link}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-start gap-4 p-4 rounded-lg hover:bg-secondary/50 transition-colors"
+                                      >
+                                        {product.thumbnail && (
+                                          <img
+                                            src={product.thumbnail}
+                                            alt={product.title}
+                                            className="w-20 h-20 object-cover rounded-md"
+                                          />
+                                        )}
+                                        <div className="flex-1 min-w-0">
+                                          <div className="flex items-start justify-between gap-2">
+                                            <h5 className="font-medium text-sm line-clamp-2">
+                                              {product.title}
+                                            </h5>
+                                            <ExternalLink className="h-4 w-4 shrink-0 text-muted-foreground" />
                                           </div>
-                                          {product.reviews && (
-                                            <span className="text-xs text-muted-foreground">
-                                              ({product.reviews})
-                                            </span>
+                                          <p className="text-sm font-medium mt-1">{product.price}</p>
+                                          {product.rating && (
+                                            <div className="flex items-center gap-2 mt-1">
+                                              <div className="flex">
+                                                {Array.from({ length: 5 }).map((_, i) => (
+                                                  <span
+                                                    key={i}
+                                                    className={`text-sm ${
+                                                      i < Math.round(product.rating)
+                                                        ? "text-yellow-400"
+                                                        : "text-muted"
+                                                    }`}
+                                                  >
+                                                    ★
+                                                  </span>
+                                                ))}
+                                              </div>
+                                              {product.reviews && (
+                                                <span className="text-xs text-muted-foreground">
+                                                  ({product.reviews})
+                                                </span>
+                                              )}
+                                            </div>
                                           )}
                                         </div>
-                                      )}
-                                    </div>
-                                  </a>
-                                ))}
+                                      </a>
+                                    ))}
+                                  </div>
+                                )}
                               </div>
                             )}
-                          </div>
-                        )}
-                              {material.usageInstructions}
-                            </p>
                           </div>
                         )}
 
