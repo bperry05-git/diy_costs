@@ -138,15 +138,17 @@ export function registerRoutes(app: Express) {
         return res.status(404).json({ error: "No products found" });
       }
 
-      const products = response.data.products.map((product: any) => ({
-        title: product.title,
-        price: product.price,
-        link: product.link,
-        thumbnail: product.thumbnail,
-        rating: product.rating,
-        reviews: product.reviews,
-        store: product.store || "Home Depot",
-      }));
+      const products = response.data.products
+        .slice(0, 5)  // Limit to 5 products
+        .map((product: any) => ({
+          title: product.title,
+          price: product.price,
+          link: product.link,
+          thumbnail: product.thumbnail,
+          rating: product.rating,
+          reviews: product.reviews,
+          store: product.store || "Home Depot",
+        }));
 
       console.log(`Found ${products.length} products`);
       res.json({ products });
