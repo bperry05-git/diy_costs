@@ -102,12 +102,20 @@ export function registerRoutes(app: Express) {
     } catch (error) {
       console.error("Failed to fetch projects:", error);
       res.status(500).json({ error: "Failed to fetch projects" });
+    }
+  });
+
   // Search Home Depot products
   app.get("/api/search-products", async (req, res) => {
     try {
       const { query } = req.query;
       if (!query) {
         return res.status(400).json({ error: "Search query is required" });
+      }
+
+      if (!process.env.SERPAPI_API_KEY) {
+        console.error("SERPAPI_API_KEY is not configured");
+        return res.status(500).json({ error: "Product search is not configured" });
       }
 
       console.log("Searching Home Depot products for:", query);
@@ -159,6 +167,6 @@ export function registerRoutes(app: Express) {
       });
     }
   });
-    }
-  });
+
+  return app;
 }
